@@ -18,34 +18,36 @@ describe("Vote circuits", () => {
     )
   })
 
-  describe("Vote()", () => {
+  describe("Vote(2)", () => {
     it("should return correct root", async () => {
       circuit = await compileAndLoadCircuit("../../../circuits/test/vote_test.circom")
 
-      const {
-	commitment,
-	nullifierHash,
-	nullifier,
-	secret
-      } = createDeposit(rbigInt(LENGTH), rbigInt(LENGTH))
+      for (let i = 0; i < 2**LEVELS; i++) {
+	const {
+	  commitment,
+	  nullifierHash,
+	  nullifier,
+	  secret
+	} = createDeposit(rbigInt(LENGTH), rbigInt(LENGTH))
 
-      tree.insert(commitment)
+	tree.insert(commitment)
 
-      const root = tree.root
-      const merkleProof = tree.getPathUpdate(0)
+	const root = tree.root
+	const merkleProof = tree.getPathUpdate(i)
 
-      const input = {
-	root,
-	nullifierHash,
-	nullifier,
-	secret,
-	path_elements: merkleProof[0],
-	path_index: merkleProof[1]
+	const input = {
+	  root,
+	  nullifierHash,
+	  nullifier,
+	  secret,
+	  path_elements: merkleProof[0],
+	  path_index: merkleProof[1]
+	}
+
+	const witness = await executeCircuit(circuit, input)
+	const circuitRoot = witness[circuit.symbols["main.new_root"].varIdx]
+	expect(circuitRoot.toString()).toEqual(root.toString())
       }
-
-      const witness = await executeCircuit(circuit, input)
-      const circuitRoot = witness[circuit.symbols["main.new_root"].varIdx]
-      expect(circuitRoot.toString()).toEqual(root.toString())
     })
   })
 })
