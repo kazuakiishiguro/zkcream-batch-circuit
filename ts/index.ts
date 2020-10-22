@@ -1,6 +1,6 @@
 import { SnarkBigInt } from 'libcream'
 
-export interface Transaction {
+export interface CircuitInput {
   root: SnarkBigInt;
   nullifierHash: SnarkBigInt;
   nullifier: SnarkBigInt;

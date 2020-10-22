@@ -1,6 +1,7 @@
 jest.setTimeout(50000)
 import {createDeposit, rbigInt} from 'libcream'
 import {compileAndLoadCircuit, executeCircuit} from 'cream-circuits'
+import { CircuitInput } from '../'
 
 const {MerkleTree} = require('cream-merkle-tree')
 const LENGTH = 31
@@ -21,6 +22,9 @@ describe("BatchVote circuits", () => {
   describe("BatchVote(2, 2)", () => {
     it("should work", async () => {
       circuit = await compileAndLoadCircuit("../../../circuits/test/batchvote_test.circom")
+
+
+
     })
   })
 })
