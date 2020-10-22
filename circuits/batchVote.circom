@@ -1,32 +1,31 @@
-include "../node_modules/cream-circuits/circom/merkleTree.circom";
 include "./vote.circom";
 
-template BatchVote(
-    levels
-    batch_size
-) {
-  // Params:
-  //        batch_size: Batch size of tx's to process (usually 2**depth)
-  //        levels: MerkleTree depth
+template BatchVote(levels, batch_size) {
+    signal input root[batch_size];
+    signal input nullifierHash[batch_size];
 
-  signal output new_root;
+    signal private input nullifier[batch_size];
+    signal private input secret[batch_size];
+    signal private input path_elements[batch_size][levels];
+    signal private input path_index[batch_size][levels];
 
-  signal input root[batch_size];
-  signal input nullifierHash[batch_size];
+    // Output: tree root
+    signal output new_root;
 
-  // batch process
-  component vote[batch_size];
-  for (var i = 0; i < batch_size; i++) {
-      vote[i] = Vote(levels);
+    component vote[batch_size];
+    for (var i = 0; i < batch_size; i++) {
+    	vote[i] = Vote(levels);
+	vote[i].root <== root[i];
+	vote[i].nullifierHash <== nullifierHash[i];
+	vote[i].nullifier <== nullifier[i];
+	vote[i].secret <== secret[i];
 
-      vote[i].root <== root[i];
-      vote[i].nullifierHash <== nullifierhash[i];
-  }
+	for (var j = 0; j < levels; j++) {
+	    vote[i].path_elements[j] <== path_elements[i][j];
+            vote[i].path_index[j] <== path_index[i][j];
+	}
+    }
 
-  // make sure calculated roots are valid
-  for (var i = 1; i < batch_size; i++) {
-      root[i] === vote[i - 1].new_root;
-  }
-
-  new_root <== vote[batch_size -1].new_root;
+    // output new_root hash
+    new_root <== vote[batch_size - 1].new_root;
 }

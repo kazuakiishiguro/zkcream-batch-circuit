@@ -6,10 +6,9 @@ const { MerkleTree } = require('cream-merkle-tree')
 const LENGTH = 31
 const LEVELS = 2
 const ZERO_VALUE = 0
-let tree
 
 describe("Vote circuits", () => {
-  let circuit
+  let tree, circuit
 
   beforeAll(() => {
     tree = new MerkleTree(
