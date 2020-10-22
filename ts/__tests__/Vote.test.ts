@@ -2,7 +2,7 @@ jest.setTimeout(50000)
 import {createDeposit, rbigInt} from 'libcream'
 import {compileAndLoadCircuit, executeCircuit} from 'cream-circuits'
 
-import {CircuitInput} from '../'
+import {CircuitInput, Deposit} from '../'
 
 const { MerkleTree } = require('cream-merkle-tree')
 const LENGTH = 31
@@ -24,23 +24,18 @@ describe("Vote circuits", () => {
       circuit = await compileAndLoadCircuit("../../../circuits/test/vote_test.circom")
 
       for (let i = 0; i < 2**LEVELS; i++) {
-	const {
-	  commitment,
-	  nullifierHash,
-	  nullifier,
-	  secret
-	} = createDeposit(rbigInt(LENGTH), rbigInt(LENGTH))
+	const deposit: Deposit = createDeposit(rbigInt(LENGTH), rbigInt(LENGTH))
 
-	tree.insert(commitment)
+	tree.insert(deposit.commitment)
 
 	const root = tree.root
 	const merkleProof = tree.getPathUpdate(i)
 
 	const input: CircuitInput = {
 	  root,
-	  nullifierHash,
-	  nullifier,
-	  secret,
+	  nullifierHash: deposit.nullifierHash,
+	  nullifier: deposit.nullifier,
+	  secret: deposit.secret,
 	  path_elements: merkleProof[0],
 	  path_index: merkleProof[1]
 	}
