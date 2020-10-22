@@ -2,6 +2,8 @@ jest.setTimeout(50000)
 import {createDeposit, rbigInt} from 'libcream'
 import {compileAndLoadCircuit, executeCircuit} from 'cream-circuits'
 
+import { Transaction } from '../'
+
 const { MerkleTree } = require('cream-merkle-tree')
 const LENGTH = 31
 const LEVELS = 2
@@ -34,7 +36,7 @@ describe("Vote circuits", () => {
 	const root = tree.root
 	const merkleProof = tree.getPathUpdate(i)
 
-	const input = {
+	const input: Transaction = {
 	  root,
 	  nullifierHash,
 	  nullifier,
