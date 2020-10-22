@@ -1,5 +1,5 @@
 jest.setTimeout(50000)
-import {createDeposit, rbigInt} from 'libcream'
+import {createDeposit, rbigInt, SnarkBigInt} from 'libcream'
 import {compileAndLoadCircuit, executeCircuit} from 'cream-circuits'
 
 import {CircuitInput, Deposit} from '../'
@@ -28,7 +28,7 @@ describe("Vote circuits", () => {
 
 	tree.insert(deposit.commitment)
 
-	const root = tree.root
+	const root: SnarkBigInt = tree.root
 	const merkleProof = tree.getPathUpdate(i)
 
 	const input: CircuitInput = {
@@ -41,7 +41,7 @@ describe("Vote circuits", () => {
 	}
 
 	const witness = await executeCircuit(circuit, input)
-	const circuitRoot = witness[circuit.symbols["main.new_root"].varIdx]
+	const circuitRoot: SnarkBigInt = witness[circuit.symbols["main.new_root"].varIdx]
 	expect(circuitRoot.toString()).toEqual(root.toString())
       }
     })
