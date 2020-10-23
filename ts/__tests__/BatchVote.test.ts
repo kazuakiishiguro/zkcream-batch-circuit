@@ -1,13 +1,29 @@
 jest.setTimeout(50000)
-import {createDeposit, rbigInt} from 'libcream'
+import {SnarkBigInt} from 'libcream'
 import {compileAndLoadCircuit, executeCircuit} from 'cream-circuits'
-import { CircuitInput } from '../'
+
+import { CircuitInput, genVote, ProcessVoteAccumulator, copyObject } from '../'
 
 const {MerkleTree} = require('cream-merkle-tree')
 const LENGTH = 31
 const LEVELS = 2
 const ZERO_VALUE = 0
-const batchSize = 2
+const banntchSize = 2
+
+const arrayBatchSize = [0, 1];
+
+const processVote = (
+  acc: ProcessVoteAccumulator
+): ProcessVoteAccumulator => {
+  const { input, tree } = acc
+
+//  const prevTree = copyObject(tree)
+
+  return {
+    input,
+    tree
+  }
+}
 
 describe("BatchVote circuits", () => {
   let tree, circuit
@@ -23,9 +39,47 @@ describe("BatchVote circuits", () => {
     it("should work", async () => {
       circuit = await compileAndLoadCircuit("../../../circuits/test/batchvote_test.circom")
 
+      const processedVotes: ProcessVoteAccumulator[] = arrayBatchSize.reduce(
+	(acc: ProcessVoteAccumulator[], index) => {
+	console.log(index)
+	const input: CircuitInput = genVote(tree, LENGTH, index)
+	const processedVote = processVote({
+	  input,
+	  tree
+	})
 
+	acc.push(processedVote)
 
+	return acc
+	}, [])
 
+      // Construct circuit inputs
+      const inputs = processedVotes.reduce(
+	(acc, curProcessedTx: ProcessVoteAccumulator) => {
+	  const {input, tree} = curProcessedTx
+
+	  Object.keys(acc).forEach(k => {
+	    acc[k].push(input[k])
+	  })
+
+	  return acc
+	},
+	{
+	  root: [],
+	  nullifierHash: [],
+	  nullifier: [],
+	  secret: [],
+	  path_elements: [],
+	  path_index: []
+	}
+      )
+
+      //       console.log(inputs)
+
+      const witness = await executeCircuit(circuit, inputs)
+      const circuitRoot: SnarkBigInt = witness[circuit.symbols["main.new_root"].varIdx]
+
+      expect(circuitRoot.toString()).toEqual(tree.root.toString())
     })
   })
 })

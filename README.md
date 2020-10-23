@@ -20,5 +20,5 @@ $ npm run test
 ## TODOs:
 
 - [X] create tx circuit
-- [ ] create batch process tx circuit
+- [X] create batch process tx circuit
 

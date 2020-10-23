@@ -1,8 +1,8 @@
 jest.setTimeout(50000)
-import {createDeposit, rbigInt, SnarkBigInt} from 'libcream'
+import {SnarkBigInt} from 'libcream'
 import {compileAndLoadCircuit, executeCircuit} from 'cream-circuits'
 
-import {CircuitInput, Deposit} from '../'
+import {CircuitInput, Deposit, genVote} from '../'
 
 const { MerkleTree } = require('cream-merkle-tree')
 const LENGTH = 31
@@ -24,25 +24,11 @@ describe("Vote circuits", () => {
       circuit = await compileAndLoadCircuit("../../../circuits/test/vote_test.circom")
 
       for (let i = 0; i < 2**LEVELS; i++) {
-	const deposit: Deposit = createDeposit(rbigInt(LENGTH), rbigInt(LENGTH))
-
-	tree.insert(deposit.commitment)
-
-	const root: SnarkBigInt = tree.root
-	const merkleProof = tree.getPathUpdate(i)
-
-	const input: CircuitInput = {
-	  root,
-	  nullifierHash: deposit.nullifierHash,
-	  nullifier: deposit.nullifier,
-	  secret: deposit.secret,
-	  path_elements: merkleProof[0],
-	  path_index: merkleProof[1]
-	}
+	const input: CircuitInput = genVote(tree, LENGTH, i)
 
 	const witness = await executeCircuit(circuit, input)
 	const circuitRoot: SnarkBigInt = witness[circuit.symbols["main.new_root"].varIdx]
-	expect(circuitRoot.toString()).toEqual(root.toString())
+	expect(circuitRoot.toString()).toEqual(input.root.toString())
       }
     })
   })
