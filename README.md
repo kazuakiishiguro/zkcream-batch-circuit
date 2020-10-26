@@ -1,5 +1,7 @@
 # CREAM batch transaction test
 
+![Test](https://github.com/couger-inc/cream-batch-circuit/workflows/Test/badge.svg)
+
 This repository is private testing playground for [CREAM](https://github.com/couger-inc/cream)'s batch transaction implementation
 
 ## Setup
