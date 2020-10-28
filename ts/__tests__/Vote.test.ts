@@ -2,7 +2,7 @@ jest.setTimeout(50000)
 import {SnarkBigInt} from 'libcream'
 import {compileAndLoadCircuit, executeCircuit} from 'cream-circuits'
 
-import {CircuitInput, Deposit, genVote} from '../'
+import {Deposit, genVote} from '../'
 
 const { MerkleTree } = require('cream-merkle-tree')
 const LENGTH = 31
@@ -24,7 +24,7 @@ describe("Vote circuits", () => {
       circuit = await compileAndLoadCircuit("../../../circuits/test/vote_test.circom")
 
       for (let i = 0; i < 2**LEVELS; i++) {
-	const input: CircuitInput = genVote(tree, LENGTH, i)
+	const { input } = genVote(tree, LENGTH, i)
 
 	const witness = await executeCircuit(circuit, input)
 	const circuitRoot: SnarkBigInt = witness[circuit.symbols["main.new_root"].varIdx]
