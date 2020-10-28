@@ -1,10 +1,10 @@
 jest.setTimeout(50000)
-import {SnarkBigInt} from 'libcream'
-import {compileAndLoadCircuit, executeCircuit} from 'cream-circuits'
+import { SnarkBigInt } from 'libcream'
+import { compileAndLoadCircuit, executeCircuit } from 'cream-circuits'
 
 import { CircuitInput, genVote, ProcessVoteAccumulator, copyObject } from '../'
 
-const {MerkleTree} = require('cream-merkle-tree')
+const { MerkleTree } = require('cream-merkle-tree')
 const LENGTH = 31
 const LEVELS = 2
 const ZERO_VALUE = 0
@@ -37,47 +37,47 @@ describe("BatchVote circuits", () => {
       circuit = await compileAndLoadCircuit("../../../circuits/test/batchvote_test.circom")
 
       const processedVotes: ProcessVoteAccumulator[] = arrayBatchSize.reduce(
-	(acc: ProcessVoteAccumulator[], index) => {
-	  if (acc.length === 0) {
-	    const { input, commitment } = genVote(tree, LENGTH, index)
-	    const processedVote = processVote({
-	      input,
-	      tree
-	    })
-	    acc.push(processedVote)
-	  } else {
-	    // Get last pushed object
-	    const lastAcc: ProcessVoteAccumulator = acc.slice(-1)[0]
-	    const { input, commitment } = genVote(lastAcc.tree, LENGTH, index)
-	    const processedVote = processVote({
-	      input,
-	      tree: lastAcc.tree
-	    })
-	    acc.push(processedVote)
-	  }
+        (acc: ProcessVoteAccumulator[], index) => {
+          if (acc.length === 0) {
+            const { input, commitment } = genVote(tree, LENGTH, index)
+            const processedVote = processVote({
+              input,
+              tree
+            })
+            acc.push(processedVote)
+          } else {
+            // Get last pushed object
+            const lastAcc: ProcessVoteAccumulator = acc.slice(-1)[0]
+            const { input, commitment } = genVote(lastAcc.tree, LENGTH, index)
+            const processedVote = processVote({
+              input,
+              tree: lastAcc.tree
+            })
+            acc.push(processedVote)
+          }
 
-	return acc
-	}, [])
+          return acc
+        }, [])
 
       // Construct circuit inputs
       const inputs = processedVotes.reduce(
-	(acc, curProcessedTx: ProcessVoteAccumulator) => {
-	  const {input, tree} = curProcessedTx
+        (acc, curProcessedTx: ProcessVoteAccumulator) => {
+          const { input, tree } = curProcessedTx
 
-	  Object.keys(acc).forEach(k => {
-	    acc[k].push(input[k])
-	  })
+          Object.keys(acc).forEach(k => {
+            acc[k].push(input[k])
+          })
 
-	  return acc
-	},
-	{
-	  root: [],
-	  nullifierHash: [],
-	  nullifier: [],
-	  secret: [],
-	  path_elements: [],
-	  path_index: []
-	}
+          return acc
+        },
+        {
+          root: [],
+          nullifierHash: [],
+          nullifier: [],
+          secret: [],
+          path_elements: [],
+          path_index: []
+        }
       )
 
       const witness = await executeCircuit(circuit, inputs)

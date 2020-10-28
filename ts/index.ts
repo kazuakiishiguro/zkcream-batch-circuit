@@ -2,8 +2,8 @@ import { createDeposit, rbigInt, SnarkBigInt } from 'libcream'
 
 const ff = require('ffjavascript')
 
-const stringifyBigInts: (obj:object) => any = ff.utils.stringifyBigInts
-const unstringifyBigInts: (obj:object) => any = ff.utils.unstringifyBigInts
+const stringifyBigInts: (obj: object) => any = ff.utils.stringifyBigInts
+const unstringifyBigInts: (obj: object) => any = ff.utils.unstringifyBigInts
 
 export interface Deposit {
   commitment: SnarkBigInt;
@@ -31,8 +31,8 @@ export interface ProcessVoteAccumulator {
   tree: any;
 }
 
-export const copyObject = (a: any):any => {
-  if(Array.isArray(a)) {
+export const copyObject = (a: any): any => {
+  if (Array.isArray(a)) {
     return Array.from(a)
   }
   return Object.assign(
