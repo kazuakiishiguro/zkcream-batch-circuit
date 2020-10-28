@@ -2,6 +2,7 @@ include "../node_modules/cream-circuits/circom/merkleTree.circom";
 include "../node_modules/cream-circuits/circom/hasher.circom";
 
 template Vote(levels) {
+    // Input(s)
     signal input root;
     signal input nullifierHash;
 
@@ -18,6 +19,7 @@ template Vote(levels) {
     hasher.secret <== secret;
     hasher.nullifierHash === nullifierHash;
 
+    // Update merkle tree
     component tree = MerkleTree(levels);
     tree.leaf <== hasher.commitment;
     tree.root <== root;

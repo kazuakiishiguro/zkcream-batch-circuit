@@ -21,6 +21,11 @@ export interface CircuitInput {
   path_index: any[any];
 }
 
+export interface VotedOutput {
+  input: CircuitInput,
+  commitment: SnarkBigInt
+}
+
 export interface ProcessVoteAccumulator {
   input: CircuitInput;
   tree: any;
@@ -40,7 +45,7 @@ export const genVote = (
   merkleTree: any,
   length: number,
   index: number
-): CircuitInput => {
+): VotedOutput => {
   const deposit: Deposit = createDeposit(rbigInt(length), rbigInt(length))
 
   const { commitment, nullifierHash, nullifier, secret } = deposit
@@ -57,5 +62,8 @@ export const genVote = (
     path_index: merkleProof[1]
   }
 
-  return input
+  return {
+    input,
+    commitment
+  }
 }

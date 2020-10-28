@@ -16,9 +16,6 @@ const processVote = (
   acc: ProcessVoteAccumulator
 ): ProcessVoteAccumulator => {
   const { input, tree } = acc
-
-//  const prevTree = copyObject(tree)
-
   return {
     input,
     tree
@@ -41,14 +38,23 @@ describe("BatchVote circuits", () => {
 
       const processedVotes: ProcessVoteAccumulator[] = arrayBatchSize.reduce(
 	(acc: ProcessVoteAccumulator[], index) => {
-	console.log(index)
-	const input: CircuitInput = genVote(tree, LENGTH, index)
-	const processedVote = processVote({
-	  input,
-	  tree
-	})
-
-	acc.push(processedVote)
+	  if (acc.length === 0) {
+	    const { input, commitment } = genVote(tree, LENGTH, index)
+	    const processedVote = processVote({
+	      input,
+	      tree
+	    })
+	    acc.push(processedVote)
+	  } else {
+	    // Get last pushed object
+	    const lastAcc: ProcessVoteAccumulator = acc.slice(-1)[0]
+	    const { input, commitment } = genVote(lastAcc.tree, LENGTH, index)
+	    const processedVote = processVote({
+	      input,
+	      tree: lastAcc.tree
+	    })
+	    acc.push(processedVote)
+	  }
 
 	return acc
 	}, [])
@@ -73,8 +79,6 @@ describe("BatchVote circuits", () => {
 	  path_index: []
 	}
       )
-
-      //       console.log(inputs)
 
       const witness = await executeCircuit(circuit, inputs)
       const circuitRoot: SnarkBigInt = witness[circuit.symbols["main.new_root"].varIdx]
