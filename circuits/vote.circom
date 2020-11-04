@@ -19,7 +19,16 @@ template Vote(levels) {
     hasher.secret <== secret;
     hasher.nullifierHash === nullifierHash;
 
-    // Update merkle tree
+    // Check if sender's inputs are valid
+    component correctTxSender = LeafExists(levels);
+    correctTxSender.leaf <== hasher.commitment;
+    correctTxSender.root <== root;
+    for(var i = 0; i < levels; i++) {
+        correctTxSender.path_elements[i] <== path_elements[i];
+    	correctTxSender.path_index[i] <== path_index[i];
+    }
+
+    // If sender's inputs are valid, update merkle tree
     component tree = MerkleTree(levels);
     tree.leaf <== hasher.commitment;
     tree.root <== root;
