@@ -7,10 +7,12 @@ const LENGTH = 31
 describe("MiMC hash circuits", () => {
   let circuit
 
+  beforeAll(async () => {
+    circuit = await compileAndLoadCircuit("test/hasher_test.circom")
+  })
+
   describe("Hasher", () => {
     it("should return correct hashed values", async () => {
-      circuit = await compileAndLoadCircuit("test/hasher_test.circom")
-
       const nullifier = rbigInt(LENGTH)
       const secret = rbigInt(LENGTH)
       const deposit = createDeposit(nullifier, secret)

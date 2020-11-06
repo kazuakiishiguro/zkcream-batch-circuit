@@ -25,7 +25,8 @@ const processVote = (
 describe("BatchVote circuits", () => {
   let tree, circuit
 
-  beforeAll(() => {
+  beforeAll(async () => {
+    circuit = await compileAndLoadCircuit("../../../circuits/test/batchvote_test.circom")
     tree = new MerkleTree(
       LEVELS,
       ZERO_VALUE
@@ -34,8 +35,6 @@ describe("BatchVote circuits", () => {
 
   describe("BatchVote(2, 2)", () => {
     it("should work", async () => {
-      circuit = await compileAndLoadCircuit("../../../circuits/test/batchvote_test.circom")
-
       const processedVotes: ProcessVoteAccumulator[] = arrayBatchSize.reduce(
         (acc: ProcessVoteAccumulator[], index) => {
           if (acc.length === 0) {

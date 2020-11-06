@@ -12,7 +12,8 @@ const ZERO_VALUE = 0
 describe("Vote circuits", () => {
   let tree, circuit
 
-  beforeAll(() => {
+  beforeAll(async () => {
+    circuit = await compileAndLoadCircuit("../../../circuits/test/vote_test.circom")
     tree = new MerkleTree(
       LEVELS,
       ZERO_VALUE
@@ -21,8 +22,6 @@ describe("Vote circuits", () => {
 
   describe("Vote(2)", () => {
     it("should return correct root", async () => {
-      circuit = await compileAndLoadCircuit("../../../circuits/test/vote_test.circom")
-
       for (let i = 0; i < 2**LEVELS; i++) {
 	const { input } = genVote(tree, LENGTH, i)
 
