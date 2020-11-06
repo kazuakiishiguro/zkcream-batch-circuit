@@ -34,7 +34,7 @@ describe("BatchVote circuits", () => {
   })
 
   describe("BatchVote(2, 2)", () => {
-    it("should work", async () => {
+    it("should work correctly", async () => {
       const processedVotes: ProcessVoteAccumulator[] = arrayBatchSize.reduce(
         (acc: ProcessVoteAccumulator[], index) => {
           if (acc.length === 0) {
