@@ -1,5 +1,5 @@
 jest.setTimeout(50000)
-import {SnarkBigInt} from 'libcream'
+import {SnarkBigInt, rbigInt} from 'libcream'
 import {compileAndLoadCircuit, executeCircuit} from 'cream-circuits'
 
 import {Deposit, genVote} from '../'
@@ -28,6 +28,58 @@ describe("Vote circuits", () => {
 	const witness = await executeCircuit(circuit, input)
 	const circuitRoot: SnarkBigInt = witness[circuit.symbols["main.new_root"].varIdx]
 	expect(circuitRoot.toString()).toEqual(input.root.toString())
+      }
+    })
+
+    it("should fail when sender sends invalid commitment (nullifier)", async () => {
+      let { input } = genVote(tree, LENGTH, 0)
+
+      // Change nullifier value
+      input.nullifier = rbigInt(31)
+
+      try {
+	await executeCircuit(circuit, input)
+      } catch {
+	expect(true).toBeTruthy()
+      }
+    })
+
+    it("should fail when sender sends invalid commitment (secret)", async () => {
+      let { input } = genVote(tree, LENGTH, 0)
+
+      // Change secret value
+      input.secret = rbigInt(31)
+
+      try {
+	await executeCircuit(circuit, input)
+      } catch {
+	expect(true).toBeTruthy()
+      }
+    })
+
+    it("should fail when sender sends invalid nullifierHash", async () => {
+      let { input } = genVote(tree, LENGTH, 0)
+
+      // Change nullifierHash value
+      input.nullifierHash = rbigInt(31)
+
+      try {
+	await executeCircuit(circuit, input)
+      } catch {
+	expect(true).toBeTruthy()
+      }
+    })
+
+    it("should fail when sender sends invalid root", async () => {
+      let { input } = genVote(tree, LENGTH, 0)
+
+      // Change root value
+      input.root = rbigInt(31)
+
+      try {
+	await executeCircuit(circuit, input)
+      } catch {
+	expect(true).toBeTruthy()
       }
     })
   })
