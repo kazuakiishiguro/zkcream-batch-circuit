@@ -38,6 +38,8 @@ template Vote(levels) {
     	tree.path_index[i] <== path_index[i];
     }
 
+    assert(tree.root != root);
+
     // output new_root hash
     new_root <== tree.root;
 }
